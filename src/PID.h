@@ -31,11 +31,6 @@ class PID {
    */
   double TotalError();
 
-  /**
-   * Set the steering value
-   */
-  double GetSteeringValue();
-
  private:
   /**
    * PID Errors
