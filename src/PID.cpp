@@ -28,3 +28,11 @@ double PID::TotalError() {
    */
   return 0.0;  // TODO: Add your total error calc here!
 }
+
+double PID::GetSteeringValue(double cte) {
+  /** 
+   * Calculate the steering value
+   */
+  return 0.0;
+
+}
