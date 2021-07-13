@@ -1,27 +1,29 @@
 #include "PID.h"
 
-/**
- * TODO: Complete the PID class. You may add any additional desired functions.
- */
-
 PID::PID() {}
 
 PID::~PID() {}
 
 void PID::Init(double Kp_, double Ki_, double Kd_) {
-  /**
-   * TODO: Initialize PID coefficients (and errors, if needed)
-   */
+  // Initialize PID coefficients
   Kp = Kp_;
   Ki = Ki_;
-  Kd = Kd_;
+  // Kd = Kd_;
+
+  // Initialize coeffiecent errors
+  // d_error = 0;
+  i_error = 0;
+  p_error = 0;
 }
 
 void PID::UpdateError(double cte) {
-  /**
-   * TODO: Update PID errors based on cte.
-   */
+  // Update PID errors based on cte.
 
+  // set the most recent cross track error
+  p_error = cte;
+
+  // update the sum of all cross track errors so far
+  i_error += cte;
 }
 
 double PID::TotalError() {
@@ -31,14 +33,13 @@ double PID::TotalError() {
   return 0.0;  // TODO: Add your total error calc here!
 }
 
-double PID::GetSteeringValue(double cte) {
-  /** 
-   * Calculate the steering value
-   */
+double PID::GetSteeringValue() {
   
-  // Proportional
-  double proportional = -Kp * cte;
+  // calculate the proportional value
+  double P = -Kp * p_error;
 
+  // calculate the intergral value
+  double I = -Ki * i_error;
 
-  return proportional;
+  return P + I;
 }

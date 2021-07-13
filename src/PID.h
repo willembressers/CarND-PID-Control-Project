@@ -34,7 +34,7 @@ class PID {
   /**
    * Set the steering value
    */
-  double GetSteeringValue(double cte);
+  double GetSteeringValue();
 
  private:
   /**

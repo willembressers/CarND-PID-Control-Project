@@ -69,7 +69,11 @@ int main() {
            *   Maybe use another PID controller to control the speed!
            */
 
-          steer_value = pid.GetSteeringValue(cte);
+          // update the errors
+          pid.UpdateError(cte);
+
+          // get the steering value
+          steer_value = pid.GetSteeringValue();
           
           // DEBUG
           std::cout << "CTE: " << cte << " Steering Value: " << steer_value 
