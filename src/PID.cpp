@@ -16,6 +16,13 @@ void PID::Init(double Kp_, double Ki_, double Kd_) {
   p_error = 0;
 }
 
+void PID::UpdateParams(double Kp_, double Ki_, double Kd_) {
+  // Update the parameters
+  Kp = Kp_;
+  Ki = Ki_;
+  Kd = Kd_;
+}
+
 void PID::UpdateError(double cte) {
   // Update PID errors based on cte.
 
@@ -30,16 +37,6 @@ void PID::UpdateError(double cte) {
 }
 
 double PID::TotalError() {
-  
-  // calculate the proportional value
-  double P = -Kp * p_error;
-
-  // calculate the intergral value
-  double I = -Ki * i_error;
-
-  // calculate the derivative value
-  double D = -Kd * d_error;
-
-  // combine the P,I,D for the steering value
-  return P + I + D;
+  // calculate the proportional, derivative, integral
+  return -Kp * p_error - Kd * d_error - Ki * i_error;
 }

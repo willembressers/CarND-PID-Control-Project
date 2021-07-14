@@ -4,10 +4,14 @@
 #include <string>
 #include "json.hpp"
 #include "PID.h"
+#include "Twiddle.h"
 
 // for convenience
 using nlohmann::json;
 using std::string;
+
+static int counter = 0;
+double throttle = 0.3;
 
 // For converting back and forth between radians and degrees.
 constexpr double pi() { return M_PI; }
@@ -34,16 +38,25 @@ int main() {
   uWS::Hub h;
 
   PID pid;
+  Twiddle twiddle;
 
-  //Initialize the pid variable.
+  // Initialize the pid variable.
+//   double Kp = 0.0;  
+//   double Ki = 0.0;
+//   double Kd = 0.0;
+  
+//   final run
   double Kp = 0.15;  
   double Ki = 0.001;
-  double Kd = 0.8; 
+  double Kd = 0.8;
 
   // initialize the pid
   pid.Init(Kp, Ki, Kd);
+  
+  // initialize twiddle
+  twiddle.Init(Kp, Ki, Kd, false);
 
-  h.onMessage([&pid](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length, 
+  h.onMessage([&pid, &twiddle](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length, 
                      uWS::OpCode opCode) {
     // "42" at the start of the message means there's a websocket message event.
     // The 4 signifies a websocket message
@@ -59,8 +72,8 @@ int main() {
         if (event == "telemetry") {
           // j[1] is the data JSON object
           double cte = std::stod(j[1]["cte"].get<string>());
-          // double speed = std::stod(j[1]["speed"].get<string>());
-          // double angle = std::stod(j[1]["steering_angle"].get<string>());
+          double speed = std::stod(j[1]["speed"].get<string>());
+//           double angle = std::stod(j[1]["steering_angle"].get<string>());
           double steer_value;
 
           // update the errors
@@ -76,15 +89,54 @@ int main() {
             steer_value = -1;
           }
           
-          // DEBUG
-          std::cout << "CTE: " << cte << " Steering Value: " << steer_value 
-                    << std::endl;
+          // Of the road (restart)
+          if (abs(cte) >= 4) {
+            std::cout << "of the road > restart simulator" << std::endl;
+            steer_value = 0;
+            throttle = 0.1;
+            counter = 0;
+            std::string msg("42[\"reset\", {}]");
+            ws.send(msg.data(), msg.length(), uWS::OpCode::TEXT);
+          }
+          
+          // update the counter
+          counter++;
+
+          if (twiddle.getStatus()) {
+            twiddle.incrementCount(cte);
+
+            // update every 100 steps the parameters
+            if (counter % 100 == 0) {
+              // increment the speed
+              throttle = throttle + 0.1;
+
+              // update the parameters
+              std::vector<double> params = twiddle.updateParams(0.2);
+
+              // log the current parameters to a file (sometimes the workspace crashes)
+              twiddle.log();
+
+              // continue with the new parameters
+              pid.UpdateParams(params[0], params[1], params[2]);
+            }
+
+
+            // don't accelerate while we're twiddling
+            if (speed > 5) {
+              throttle = 0;
+            }
+          }
+          
+//           // DEBUG
+//           if (counter % 10 == 0) {
+//             std::cout << "counter: " << counter << " CTE: " << cte << " Steering Value: " << steer_value << " angle: " << angle << " speed: " << speed << " throttle: " << throttle << std::endl;
+//           }
 
           json msgJson;
           msgJson["steering_angle"] = steer_value;
-          msgJson["throttle"] = 0.3;
+          msgJson["throttle"] = throttle;
           auto msg = "42[\"steer\"," + msgJson.dump() + "]";
-          std::cout << msg << std::endl;
+//           std::cout << msg << std::endl;
           ws.send(msg.data(), msg.length(), uWS::OpCode::TEXT);
         }  // end "telemetry" if
       } else {
