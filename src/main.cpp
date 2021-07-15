@@ -91,10 +91,15 @@ int main() {
           
           // Of the road (restart)
           if (abs(cte) >= 4) {
+            // notify whats happening
             std::cout << "of the road > restart simulator" << std::endl;
+
+            // reset the values
             steer_value = 0;
             throttle = 0.1;
             counter = 0;
+
+            // trigger the reset
             std::string msg("42[\"reset\", {}]");
             ws.send(msg.data(), msg.length(), uWS::OpCode::TEXT);
           }
@@ -119,7 +124,6 @@ int main() {
               // continue with the new parameters
               pid.UpdateParams(params[0], params[1], params[2]);
             }
-
 
             // don't accelerate while we're twiddling
             if (speed > 5) {

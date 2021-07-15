@@ -13,6 +13,7 @@ class Twiddle {
   double total_err;
   double best_err;
   double sum;
+  bool running;
 
   std::vector<double> p;
   std::vector<double> dp;
@@ -32,13 +33,18 @@ class Twiddle {
   /**
    * Initialize Twiddle.
    */
-  void Init(double Kp, double Ki, double Kd);
+  void Init(double Kp, double Ki, double Kd, bool status);
 
   /**
    * Increment cross track error
    */
   void incrementCount(double cte);
 
+  /**
+   * Returns the twittle status
+   */
+  bool getStatus();
+    
   /**
    * Update the PID coeffiecents
    */
