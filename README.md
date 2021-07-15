@@ -38,7 +38,7 @@ Fellow students have put together a guide to Windows set-up for the project [her
 
 The goal of this project was to let the car drive around the track without running of the road. The only input we'll recieve is the `crosstrack_error` (`cte`). This is the distance from the center from the car to the center of the road. So we want a controller that minimizes the distance (`cte`).
 
-![](cte.jpg)
+![](images/cte.jpg)
 
 ### PID controller
 I've build an PID controller in order to achieve the goal. The PID controller stands for **Proportional Integral Differential**. Let's break it down.
@@ -51,7 +51,7 @@ If we want to minimize the `cte` we'll have to adjust the steering angle towards
 
 If we implement this to our car the ride would look like this:
 
-![](4.png)
+![](images/4.png)
 
 The ride would definitly be smoother, be the car is always oscilating towards the center of the road. That's in my opinion not a comfortable ride. If only we've had something to fix this.
 
@@ -66,7 +66,7 @@ We need to adjust the steering angle when we approach the center of the road. If
 
 If we implement this to our car the ride would look like this:
 
-![](7.png)
+![](images/7.png)
 
 Much better.. So what does the integral part do then?
 
@@ -82,7 +82,7 @@ We'll do this by calculating the sum of all `cte`'s we've seen so far. If there 
 
 So now the car always drives towards the center including a `systematic bias`.
 
-![](pid.png)
+![](images/pid.png)
 
 ### Twiddle
 Ok that's great but what (`Kp`, `Ki`, `Kd`) values do i need to enter to get the PID controller to drive smoothly? We can fiddle around until we find the best settings for our car, or we can use `Twiddle`. `Twiddle` is basically a hyperparameter search that brute forces into a local optimum. It runs many times, where in each run, it measures how "good" the run is. If the run is not good it will adjust the hyperparameters based on some potential changes.
