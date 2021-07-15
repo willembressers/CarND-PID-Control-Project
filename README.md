@@ -47,6 +47,7 @@ I've build an PID controller in order to achieve the goal. The PID controller st
 If we want to minimize the `cte` we'll have to adjust the steering angle towards the center of the road. We can't use a fixed steering angle because this would steer the car in circles. No we need a dynamic value that adjusts constantly based on the `cte`. If we'll use the `cte` value itself to steer, than we steer directly towards the center of the road. This means that the car tries to steer sharper than it's fysical limits, and the ride would be very unpleasant. No if we can multiply the `cte` with some value, the steering will be smoother. Let's call this value `Kp`. 
 
 > P = -Kp * cte
+> 
 > steering_angle = P
 
 If we implement this to our car the ride would look like this:
@@ -61,7 +62,9 @@ The problem of the proportional part is that it's reactive. It's steers toward t
 We need to adjust the steering angle when we approach the center of the road. If we'll use the difference from the previous `cte` to the current `cte` and we subtract that from the angle, than the car would still overshoot the center, but after a while the car will reach the center of the road. This is because the difference between the 2 `cte`'s is relativly small compared to the proportional part. So if we muliply the difference with a 'big' value the car would less overshoot and drive more smoothly towards the center. Let's call this 'big' value `Kd`. 
 
 > P = -Kp * cte
+> 
 > D = Kd * (cte - cte_prev)
+> 
 > steering_angle = P - D
 
 If we implement this to our car the ride would look like this:
@@ -76,8 +79,11 @@ The Integral part counters for the `systematic bias`. Suppose the car mechanic t
 We'll do this by calculating the sum of all `cte`'s we've seen so far. If there is no `systematic bias` the car will steer towards the center and thus the sum of all `cte` will become relativly small. But it there is a `systematic bias` than the sum of all `cte`'s well become higher and higher. If we now directly subtract the sum from the P & D values, this will result in strong steering angles. So again let's add an 'small' `Ki` value to multuply the sum.
 
 > P = -Kp * cte
+> 
 > D = Kd * (cte - cte_prev)
+> 
 > I = Ki * sum(ctes)
+> 
 > steering_angle = P - D - I
 
 So now the car always drives towards the center including a `systematic bias`.
