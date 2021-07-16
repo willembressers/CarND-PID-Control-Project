@@ -20,6 +20,12 @@ class PID {
   void Init(double Kp_, double Ki_, double Kd_);
 
   /**
+   * Update the parameters
+   * @param (Kp_, Ki_, Kd_) The initial PID coefficients 
+   */
+  void UpdateParams(double Kp_, double Ki_, double Kd_);
+
+  /**
    * Update the PID error variables given cross track error.
    * @param cte The current cross track error
    */
